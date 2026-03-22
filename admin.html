@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin – Ingle Dance Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{--gold:#f0b429;--purple:#a855f7;--purple-dark:#7c3aed;--black:#080808;--dark:#111;--card:#181818;--card2:#1e1e1e;--border:#2a2a2a;--text:#e8e8e8;--muted:#888;--wa:#25D366;--red:#ef4444;--green:#22c55e;}
+*{margin:0;padding:0;box-sizing:border-box;}body{background:var(--black);color:var(--text);font-family:'Raleway',sans-serif;min-height:100vh;}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(168,85,247,.15),transparent),var(--black);}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;max-width:420px;width:100%;text-align:center;}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;background:linear-gradient(135deg,var(--gold),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;margin-bottom:6px;}
+.login-box input{width:100%;background:#222;border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:1rem;padding:14px 16px;outline:none;margin-bottom:14px;font-family:'Raleway',sans-serif;transition:border-color .2s;}
+.login-box input:focus{border-color:var(--gold);}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--gold),#f59e0b);color:#000;font-weight:900;font-size:1rem;padding:14px;border-radius:12px;border:none;cursor:pointer;}
+.login-err{color:var(--red);font-size:.82rem;margin-top:10px;display:none;}
+.fw-note{margin-top:16px;background:rgba(240,180,41,.1);border:1px solid rgba(240,180,41,.3);border-radius:10px;padding:12px;font-size:.8rem;color:var(--gold);text-align:left;}
+.admin-wrap{display:flex;min-height:100vh;}
+.sidebar{width:240px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .3s;overflow-y:auto;}
+.sb-logo{padding:18px 20px 12px;border-bottom:1px solid var(--border);}
+.sb-logo div:first-child{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;background:linear-gradient(135deg,var(--gold),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sb-logo div:last-child{font-size:.7rem;color:var(--muted);}
+.sb-nav{flex:1;padding:10px 0;}
+.nav-sec{font-size:.63rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:10px 20px 4px;}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--muted);transition:background .2s,color .2s;border-left:3px solid transparent;}
+.ni:hover{background:rgba(255,255,255,.04);color:var(--text);}
+.ni.active{background:rgba(240,180,41,.08);color:var(--gold);border-left-color:var(--gold);}
+.sb-foot{padding:14px 20px;border-top:1px solid var(--border);}
+.btn-prev{display:flex;align-items:center;gap:8px;background:rgba(168,85,247,.15);color:var(--purple);font-weight:700;font-size:.82rem;padding:10px 14px;border-radius:10px;cursor:pointer;border:1px solid rgba(168,85,247,.3);margin-bottom:8px;width:100%;}
+.btn-logout{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.1);color:var(--red);font-weight:700;font-size:.82rem;padding:10px 14px;border-radius:10px;cursor:pointer;border:1px solid rgba(239,68,68,.2);width:100%;}
+.main-content{margin-left:240px;flex:1;padding:28px;}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.pt{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;background:linear-gradient(135deg,var(--gold),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.pd{font-size:.82rem;color:var(--muted);margin-top:2px;}
+.save-btn{background:linear-gradient(135deg,var(--green),#16a34a);color:#fff;font-weight:800;font-size:.88rem;padding:10px 24px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform .2s;}
+.save-btn:hover{transform:translateY(-2px);}
+.toast{position:fixed;top:20px;right:20px;font-weight:700;padding:12px 22px;border-radius:12px;z-index:9999;transform:translateY(-80px);opacity:0;transition:.4s;font-size:.88rem;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:var(--green);color:#fff;}
+.toast.err{background:var(--red);color:#fff;}
+.panel{display:none;}
+.panel.active{display:block;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px;}
+.card-title{font-weight:800;font-size:.95rem;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:.75rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.field input,.field textarea,.field select{width:100%;background:#222;border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Raleway',sans-serif;font-size:.88rem;padding:10px 14px;outline:none;resize:vertical;transition:border-color .2s;}
+.field input:focus,.field textarea:focus{border-color:var(--gold);}
+.field textarea{min-height:80px;}
+.hint{font-size:.72rem;color:var(--muted);margin-top:4px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.list-wrap{display:flex;flex-direction:column;gap:12px;}
+.li{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.li-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.li-title{font-weight:700;font-size:.9rem;color:var(--gold);}
+.btn-del{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:5px 12px;font-size:.75rem;font-weight:700;cursor:pointer;}
+.btn-add{display:flex;align-items:center;gap:8px;background:rgba(240,180,41,.1);color:var(--gold);border:1px dashed rgba(240,180,41,.4);border-radius:12px;padding:12px 20px;font-size:.85rem;font-weight:700;cursor:pointer;width:100%;justify-content:center;margin-top:8px;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:24px;}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;}
+.sc .num{font-family:'Bebas Neue',sans-serif;font-size:2rem;background:linear-gradient(135deg,var(--gold),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sc .lbl{font-size:.7rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+.toggle{position:relative;width:46px;height:24px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.tog-sl{position:absolute;inset:0;background:#333;border-radius:24px;transition:.3s;}
+.tog-sl::before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
+.toggle input:checked+.tog-sl{background:var(--green);}
+.toggle input:checked+.tog-sl::before{transform:translateX(22px);}
+.tw{display:flex;align-items:center;gap:10px;}
+.info-box{background:linear-gradient(135deg,rgba(240,180,41,.06),rgba(168,85,247,.06));border:1px solid rgba(240,180,41,.2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:.85rem;color:var(--muted);line-height:1.8;}
+.info-box strong{color:var(--text);}
+.info-box code{background:#222;padding:2px 7px;border-radius:5px;font-family:monospace;color:var(--gold);font-size:.82rem;}
+.sb-toggle{display:none;position:fixed;top:14px;left:14px;z-index:200;background:var(--gold);color:#000;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:1.1rem;}
+@media(max-width:768px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main-content{margin-left:0;}.sb-toggle{display:block;}.g2,.g3{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">🕺 Admin Panel</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:24px;">Ingle Dance Academy</div>
+    <input type="text" id="lu" placeholder="Username" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <input type="password" id="lp" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">🔐 Login</button>
+    <div class="login-err" id="lerr">❌ Invalid credentials</div>
+    <div class="fw-note">⚡ <strong>Firebase Connected</strong> — Changes save to Firebase Realtime Database instantly and appear live on your website for all visitors.</div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none">
+  <button class="sb-toggle" onclick="document.getElementById('sb').classList.toggle('open')">☰</button>
+  <div class="admin-wrap">
+    <aside class="sidebar" id="sb">
+      <div class="sb-logo"><div>🕺 Admin Panel</div><div>Ingle Dance Academy</div></div>
+      <nav class="sb-nav">
+        <div class="nav-sec">Dashboard</div>
+        <div class="ni active" onclick="showP('dashboard',this)"><span>📊</span> Overview</div>
+        <div class="nav-sec">Content</div>
+        <div class="ni" onclick="showP('general',this)"><span>⚙️</span> General Settings</div>
+        <div class="ni" onclick="showP('hero',this)"><span>🎯</span> Hero Section</div>
+        <div class="ni" onclick="showP('ann',this)"><span>📢</span> Announcements</div>
+        <div class="ni" onclick="showP('about',this)"><span>ℹ️</span> About Section</div>
+        <div class="ni" onclick="showP('classes',this)"><span>💃</span> Dance Classes</div>
+        <div class="ni" onclick="showP('camp',this)"><span>☀️</span> Summer Camp</div>
+        <div class="ni" onclick="showP('videos',this)"><span>🎬</span> Videos</div>
+        <div class="ni" onclick="showP('gallery',this)"><span>📸</span> Gallery</div>
+        <div class="ni" onclick="showP('testi',this)"><span>⭐</span> Testimonials</div>
+        <div class="ni" onclick="showP('contact',this)"><span>📍</span> Contact</div>
+        <div class="ni" onclick="showP('pw',this)"><span>🔑</span> Change Password</div>
+      </nav>
+      <div class="sb-foot">
+        <button class="btn-prev" onclick="window.open('index.html','_blank')">👁️ Preview Website</button>
+        <button class="btn-logout" onclick="doLogout()">🚪 Logout</button>
+      </div>
+    </aside>
+    <main class="main-content">
+      <div id="toast" class="toast ok"></div>
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="ph"><div><div class="pt">📊 Dashboard</div><div class="pd">Firebase-powered live website</div></div></div>
+        <div class="stats-row">
+          <div class="sc"><div class="num" id="s-ann">—</div><div class="lbl">Announcements</div></div>
+          <div class="sc"><div class="num" id="s-cls">—</div><div class="lbl">Classes</div></div>
+          <div class="sc"><div class="num" id="s-cmp">—</div><div class="lbl">Camp Programs</div></div>
+          <div class="sc"><div class="num" id="s-vid">—</div><div class="lbl">Videos</div></div>
+          <div class="sc"><div class="num" id="s-tst">—</div><div class="lbl">Testimonials</div></div>
+        </div>
+        <div class="card" style="border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.05)">
+          <div class="card-title"><span>🔥</span> Firebase Status</div>
+          <div id="fbStatus" style="font-size:.88rem;color:var(--muted)">Connecting to Firebase...</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span>💡</span> How This Works</div>
+          <div style="font-size:.85rem;color:var(--muted);line-height:1.9">
+            <p>✅ <strong style="color:var(--text)">Firebase Realtime Database</strong> — your website reads content from Firebase</p>
+            <p>✅ <strong style="color:var(--text)">Save here → Live instantly</strong> — no deployment needed after changes</p>
+            <p>✅ <strong style="color:var(--text)">Works from any device</strong> — open admin.html from phone, PC, anywhere</p>
+            <p>✅ <strong style="color:var(--text)">YouTube videos</strong> — zero lag, Google CDN, paste video ID only</p>
+            <p>✅ <strong style="color:var(--text)">Free tier</strong> — Firebase Spark plan is free for small websites</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GENERAL -->
+      <div class="panel" id="panel-general">
+        <div class="ph"><div><div class="pt">⚙️ General Settings</div></div><button class="save-btn" onclick="saveGeneral()">💾 Save to Firebase</button></div>
+        <div class="card">
+          <div class="field"><label>WhatsApp Number (with country code, no +)</label><input id="g-wa" placeholder="919876543210"/><div class="hint">India: 91 + 10-digit number. E.g. 919876543210</div></div>
+          <div class="field"><label>Notice Banner (top of page — leave blank to hide)</label><input id="g-notice" placeholder="🎉 June batch is now full. Registrations open for July!"/></div>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <div class="panel" id="panel-hero">
+        <div class="ph"><div><div class="pt">🎯 Hero Section</div></div><button class="save-btn" onclick="saveHero()">💾 Save to Firebase</button></div>
+        <div class="card">
+          <div class="field"><label>Badge Text</label><input id="h-badge" placeholder="🏆 Akot's Premier Dance Academy"/></div>
+          <div class="field"><label>Main Title (new line = line break; last line shows in gold)</label><textarea id="h-title" rows="3"></textarea></div>
+          <div class="field"><label>Subtitle</label><textarea id="h-sub" rows="3"></textarea></div>
+          <div class="field"><label>Background YouTube Video ID (optional)</label><input id="h-yt" placeholder="e.g. dQw4w9WgXcQ"/><div class="hint">Leave blank for animated gradient. Video plays muted in background.</div></div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div class="panel" id="panel-ann">
+        <div class="ph"><div><div class="pt">📢 Announcements</div></div><button class="save-btn" onclick="saveAnn()">💾 Save to Firebase</button></div>
+        <div class="card"><div class="list-wrap" id="ann-list"></div><button class="btn-add" onclick="addAnn()">+ Add Announcement</button></div>
+      </div>
+
+      <!-- ABOUT -->
+      <div class="panel" id="panel-about">
+        <div class="ph"><div><div class="pt">ℹ️ About Section</div></div><button class="save-btn" onclick="saveAbout()">💾 Save to Firebase</button></div>
+        <div class="card">
+          <div class="field"><label>Academy Name</label><input id="ab-name"/></div>
+          <div class="field"><label>Short Description (card)</label><textarea id="ab-desc" rows="3"></textarea></div>
+          <div class="field"><label>Long Description</label><textarea id="ab-long" rows="5"></textarea></div>
+        </div>
+      </div>
+
+      <!-- CLASSES -->
+      <div class="panel" id="panel-classes">
+        <div class="ph"><div><div class="pt">💃 Dance Classes</div></div><button class="save-btn" onclick="saveClasses()">💾 Save to Firebase</button></div>
+        <div class="list-wrap" id="cls-list"></div>
+        <button class="btn-add" onclick="addCls()">+ Add Dance Class</button>
+      </div>
+
+      <!-- CAMP -->
+      <div class="panel" id="panel-camp">
+        <div class="ph"><div><div class="pt">☀️ Summer Camp</div></div><button class="save-btn" onclick="saveCamp()">💾 Save to Firebase</button></div>
+        <div class="card">
+          <div class="g2">
+            <div class="field"><label>Season Badge</label><input id="cp-badge" placeholder="☀️ Summer 2026 · Open Now"/></div>
+            <div class="field"><label>Section Description</label><input id="cp-desc" placeholder="Registrations open! Limited seats."/></div>
+          </div>
+        </div>
+        <div class="card"><div class="list-wrap" id="camp-list"></div><button class="btn-add" onclick="addCamp()">+ Add Camp Program</button></div>
+      </div>
+
+      <!-- VIDEOS -->
+      <div class="panel" id="panel-videos">
+        <div class="ph"><div><div class="pt">🎬 Videos</div></div><button class="save-btn" onclick="saveVideos()">💾 Save to Firebase</button></div>
+        <div class="info-box"><strong>How to get YouTube Video ID:</strong><br/>Go to your video on YouTube → look at the URL → copy the part after <code>v=</code><br/>Example: youtube.com/watch?v=<strong style="color:var(--gold)">dQw4w9WgXcQ</strong> → ID is <code>dQw4w9WgXcQ</code><br/>Upload dance videos as <strong>Unlisted</strong> on YouTube for privacy.</div>
+        <div class="list-wrap" id="vid-list"></div>
+        <button class="btn-add" onclick="addVid()">+ Add Video</button>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="panel" id="panel-gallery">
+        <div class="ph"><div><div class="pt">📸 Gallery</div></div><button class="save-btn" onclick="saveGallery()">💾 Save to Firebase</button></div>
+        <div class="info-box"><strong>Free photo hosting:</strong> Upload to <strong style="color:var(--gold)">imgbb.com</strong> → copy Direct Link → paste below. Leave URL blank to show emoji placeholder.</div>
+        <div class="list-wrap" id="gal-list"></div>
+      </div>
+
+      <!-- TESTIMONIALS -->
+      <div class="panel" id="panel-testi">
+        <div class="ph"><div><div class="pt">⭐ Testimonials</div></div><button class="save-btn" onclick="saveTesti()">💾 Save to Firebase</button></div>
+        <div class="list-wrap" id="testi-list"></div>
+        <button class="btn-add" onclick="addTesti()">+ Add Testimonial</button>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="panel" id="panel-contact">
+        <div class="ph"><div><div class="pt">📍 Contact Info</div></div><button class="save-btn" onclick="saveContact()">💾 Save to Firebase</button></div>
+        <div class="card">
+          <div class="field"><label>Full Address</label><textarea id="c-addr" rows="3"></textarea></div>
+          <div class="g2">
+            <div class="field"><label>Phone Display</label><input id="c-phone" placeholder="+91 99999 99999"/></div>
+            <div class="field"><label>Class Timings</label><input id="c-time" placeholder="Morning: 7 AM – 9 AM"/></div>
+          </div>
+          <div class="field"><label>Google Maps Embed Code</label><textarea id="c-map" rows="5" placeholder="Paste the iframe embed code from Google Maps → Share → Embed a map"></textarea><div class="hint">Go to Google Maps → Search your location → Share → Embed a map → Copy HTML</div></div>
+        </div>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="panel" id="panel-pw">
+        <div class="ph"><div><div class="pt">🔑 Change Password</div></div><button class="save-btn" onclick="savePW()">💾 Save Password</button></div>
+        <div class="card">
+          <div class="field"><label>New Username</label><input id="pw-u" placeholder="admin"/></div>
+          <div class="field"><label>New Password</label><input type="password" id="pw-p" placeholder="New password"/></div>
+          <div class="field"><label>Confirm Password</label><input type="password" id="pw-c" placeholder="Confirm"/></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getDatabase,ref,set,get,onValue}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ╔══════════════════════════════════════════════╗
+// ║  🔧 PASTE YOUR FIREBASE CONFIG HERE          ║
+// ╚══════════════════════════════════════════════╝
+const firebaseConfig={
+  apiKey:"AIzaSyDmX1ZO2IFQHXx1vNzxSOm_nBjFLc4IwjA",
+  authDomain:"ingledanceacademy.firebaseapp.com",
+  databaseURL:"https://ingledanceacademy-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"ingledanceacademy",
+  storageBucket:"ingledanceacademy.firebasestorage.app",
+  messagingSenderId:"782120901441",
+  appId:"1:782120901441:web:554f2d6dbde92aa910dfc0"
+};
+let db;
+try{
+  const app=initializeApp(firebaseConfig);
+  db=getDatabase(app);
+  window._db=db;
+  window._ref=ref;
+  window._set=set;
+  window._get=get;
+  document.getElementById('fbStatus').innerHTML='<span style="color:#22c55e;font-weight:700">✅ Connected to Firebase!</span> Changes you save here will appear live on your website instantly.';
+  // Load all data for stats
+  onValue(ref(db,'announcements'),s=>{const v=s.val();document.getElementById('s-ann').textContent=v?Object.keys(v).length:0;});
+  onValue(ref(db,'classes'),s=>{const v=s.val();document.getElementById('s-cls').textContent=v?Object.keys(v).length:0;});
+  onValue(ref(db,'camp/programs'),s=>{const v=s.val();document.getElementById('s-cmp').textContent=v?Object.keys(v).length:0;});
+  onValue(ref(db,'videos'),s=>{const v=s.val();document.getElementById('s-vid').textContent=v?Object.values(v).filter(x=>x.ytId).length:0;});
+  onValue(ref(db,'testimonials'),s=>{const v=s.val();document.getElementById('s-tst').textContent=v?Object.keys(v).length:0;});
+}catch(e){
+  document.getElementById('fbStatus').innerHTML='<span style="color:#ef4444;font-weight:700">❌ Firebase not connected.</span> Please paste your Firebase config in admin.html and index.html.';
+}
+</script>
+
+<script>
+// ── AUTH ──────────────────────────────────────────────────
+const DEFAULT_CREDS={user:'admin',pass:'dance2026'};
+function doLogin(){
+  const u=document.getElementById('lu').value;
+  const p=document.getElementById('lp').value;
+  const su=localStorage.getItem('ida_u')||DEFAULT_CREDS.user;
+  const sp=localStorage.getItem('ida_p')||DEFAULT_CREDS.pass;
+  if(u===su&&p===sp){sessionStorage.setItem('ida_auth','1');document.getElementById('loginScreen').style.display='none';document.getElementById('adminPanel').style.display='block';initAdmin();}
+  else{document.getElementById('lerr').style.display='block';}
+}
+function doLogout(){sessionStorage.removeItem('ida_auth');location.reload();}
+window.onload=()=>{if(sessionStorage.getItem('ida_auth')==='1'){document.getElementById('loginScreen').style.display='none';document.getElementById('adminPanel').style.display='block';initAdmin();}};
+
+// ── PANEL NAV ─────────────────────────────────────────────
+function showP(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('sb').classList.remove('open');
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.className='toast '+(ok?'ok':'err'),2500);}
+
+// ── FIREBASE HELPERS ──────────────────────────────────────
+async function fbSet(path,data){
+  if(!window._db){toast('❌ Firebase not connected!',false);return false;}
+  try{await window._set(window._ref(window._db,path),data);return true;}
+  catch(e){toast('❌ Save failed: '+e.message,false);return false;}
+}
+async function fbGet(path){
+  if(!window._db)return null;
+  try{const s=await window._get(window._ref(window._db,path));return s.val();}
+  catch(e){return null;}
+}
+
+// ── VALUE HELPER ──────────────────────────────────────────
+function v(id){return document.getElementById(id)?.value||'';}
+
+// ── INIT ──────────────────────────────────────────────────
+async function initAdmin(){
+  loadGeneral();loadHero();loadAbout();loadContact();
+  await loadAnn();await loadCls();await loadCamp();
+  await loadVids();loadGallery();await loadTesti();
+}
+
+// ── GENERAL ──────────────────────────────────────────────
+async function loadGeneral(){
+  const d=await fbGet('settings')||{};
+  document.getElementById('g-wa').value=d.waNumber||'';
+  document.getElementById('g-notice').value=d.noticeBanner||'';
+}
+async function saveGeneral(){
+  const ok=await fbSet('settings',{waNumber:v('g-wa'),noticeBanner:v('g-notice')});
+  if(ok)toast('✅ General settings saved!');
+}
+
+// ── HERO ─────────────────────────────────────────────────
+async function loadHero(){
+  const d=await fbGet('hero')||{};
+  document.getElementById('h-badge').value=d.badge||'';
+  document.getElementById('h-title').value=d.title||'';
+  document.getElementById('h-sub').value=d.sub||'';
+  document.getElementById('h-yt').value=d.ytId||'';
+}
+async function saveHero(){
+  const ok=await fbSet('hero',{badge:v('h-badge'),title:v('h-title'),sub:v('h-sub'),ytId:v('h-yt')});
+  if(ok)toast('✅ Hero section saved!');
+}
+
+// ── ANNOUNCEMENTS ─────────────────────────────────────────
+let annItems=[];
+async function loadAnn(){
+  const d=await fbGet('announcements');
+  annItems=d?Object.values(d):[{text:"🎉 Summer Camp 2026 Open!",program:"Summer Camp 2026"},{text:"💃 Wedding Choreography – Book Now!",program:"Wedding Choreography"},{text:"🔥 Garba Batch – Limited Seats!",program:"Garba Special Batch"}];
+  renderAnn();
+}
+function renderAnn(){
+  document.getElementById('ann-list').innerHTML=annItems.map((a,i)=>`
+    <div class="li">
+      <div class="li-head"><div class="li-title">Slide ${i+1}</div><button class="btn-del" onclick="delAnn(${i})">🗑️ Delete</button></div>
+      <div class="field"><label>Banner Text</label><input id="an-t-${i}" value="${esc(a.text)}"/></div>
+      <div class="field"><label>Registration Program</label><input id="an-p-${i}" value="${esc(a.program)}"/></div>
+    </div>`).join('');
+}
+function addAnn(){annItems.push({text:"🎉 New Offer!",program:"General Enquiry"});renderAnn();}
+function delAnn(i){annItems.splice(i,1);renderAnn();}
+async function saveAnn(){
+  const data={};
+  annItems.map((a,i)=>({text:v(`an-t-${i}`),program:v(`an-p-${i}`)})).forEach((a,i)=>data['a'+i]=a);
+  const ok=await fbSet('announcements',data);
+  if(ok)toast('✅ Announcements saved!');
+}
+
+// ── ABOUT ────────────────────────────────────────────────
+async function loadAbout(){
+  const d=await fbGet('about')||{};
+  document.getElementById('ab-name').value=d.name||'Ingle Dance Academy';
+  document.getElementById('ab-desc').value=d.desc||'';
+  document.getElementById('ab-long').value=d.long||'';
+}
+async function saveAbout(){
+  const ok=await fbSet('about',{name:v('ab-name'),desc:v('ab-desc'),long:v('ab-long')});
+  if(ok)toast('✅ About saved!');
+}
+
+// ── CLASSES ──────────────────────────────────────────────
+let clsItems=[];
+async function loadCls(){
+  const d=await fbGet('classes');
+  clsItems=d?Object.values(d):[
+    {name:"Hip Hop Dance",tag:"Hip Hop",tagClass:"hiphop",emoji:"🎤",bg:"bg3",desc:"Master street-style moves and powerful urban choreography.",duration:"3 months",level:"All levels",age:"Age 8+",ytId:""},
+    {name:"Bollywood Dance",tag:"Bollywood",tagClass:"bollywood",emoji:"🎬",bg:"bg2",desc:"Groove to Bollywood hits with high energy expressions.",duration:"3 months",level:"Beginner friendly",age:"All ages",ytId:""},
+    {name:"Garba Dance",tag:"Garba",tagClass:"garba",emoji:"🪔",bg:"bg5",desc:"Navratri Garba and Dandiya training.",duration:"45 days",level:"Group batch",age:"Age 5+",ytId:""},
+    {name:"Wedding Choreography",tag:"Wedding",tagClass:"wedding",emoji:"💍",bg:"bg4",desc:"Custom sangeet choreography for family.",duration:"Flexible",level:"Private/Group",age:"Any age",ytId:""}
+  ];
+  renderCls();
+}
+function renderCls(){
+  document.getElementById('cls-list').innerHTML=clsItems.map((c,i)=>`
+    <div class="li">
+      <div class="li-head"><div class="li-title">${c.emoji} ${c.name}</div><button class="btn-del" onclick="delCls(${i})">🗑️ Delete</button></div>
+      <div class="g3">
+        <div class="field"><label>Name</label><input id="cl-n-${i}" value="${esc(c.name)}"/></div>
+        <div class="field"><label>Tag Label</label><input id="cl-tg-${i}" value="${esc(c.tag)}"/></div>
+        <div class="field"><label>Emoji</label><input id="cl-em-${i}" value="${esc(c.emoji)}"/></div>
+      </div>
+      <div class="field"><label>Description</label><textarea id="cl-ds-${i}">${esc(c.desc)}</textarea></div>
+      <div class="g3">
+        <div class="field"><label>Duration</label><input id="cl-du-${i}" value="${esc(c.duration)}"/></div>
+        <div class="field"><label>Level</label><input id="cl-lv-${i}" value="${esc(c.level)}"/></div>
+        <div class="field"><label>Age Group</label><input id="cl-ag-${i}" value="${esc(c.age)}"/></div>
+      </div>
+      <div class="field"><label>YouTube Video ID (optional – for class card preview)</label><input id="cl-yt-${i}" value="${esc(c.ytId||'')}" placeholder="e.g. dQw4w9WgXcQ"/>
+        ${c.ytId?`<div style="margin-top:8px;border-radius:8px;overflow:hidden"><iframe style="width:100%;height:140px;border:none" src="https://www.youtube.com/embed/${c.ytId}" loading="lazy" allowfullscreen></iframe></div>`:''}
+      </div>
+    </div>`).join('');
+}
+function addCls(){clsItems.push({name:"New Class",tag:"Dance",tagClass:"bollywood",emoji:"💃",bg:"bg1",desc:"Class description.",duration:"3 months",level:"All levels",age:"All ages",ytId:""});renderCls();}
+function delCls(i){clsItems.splice(i,1);renderCls();}
+async function saveClasses(){
+  const data={};
+  clsItems.map((c,i)=>({...c,name:v(`cl-n-${i}`),tag:v(`cl-tg-${i}`),emoji:v(`cl-em-${i}`),desc:v(`cl-ds-${i}`),duration:v(`cl-du-${i}`),level:v(`cl-lv-${i}`),age:v(`cl-ag-${i}`),ytId:v(`cl-yt-${i}`)})).forEach((c,i)=>data['c'+i]=c);
+  const ok=await fbSet('classes',data);
+  if(ok)toast('✅ Classes saved!');
+}
+
+// ── CAMP ─────────────────────────────────────────────────
+let campItems=[];
+async function loadCamp(){
+  const d=await fbGet('camp')||{};
+  document.getElementById('cp-badge').value=d.seasonBadge||'☀️ Summer 2026 · Open Now';
+  document.getElementById('cp-desc').value=d.desc||'Registrations open! Limited seats.';
+  campItems=d.programs?Object.values(d.programs):[
+    {name:"Kids Summer Dance Camp",emoji:"🌟",badge:"Most Popular",featured:true,desc:"Fun summer camp for kids aged 5–15.",duration:"30 Days (May–June 2026)",timing:"Morning: 8 AM – 10 AM",age:"Age 5 – 15",seats:"Only 20 seats left!"},
+    {name:"Garba Summer Camp",emoji:"🪔",badge:"Navratri Prep",featured:false,desc:"Learn Garba and Dandiya for Navratri.",duration:"21 Days (June 2026)",timing:"Evening: 5 PM – 7 PM",age:"Age 10+",seats:"Limited to 25 students"},
+    {name:"Wedding Dance Bootcamp",emoji:"💒",badge:"Premium",featured:false,desc:"Intensive bootcamp for wedding families.",duration:"Flexible: 15–45 Days",timing:"By appointment",age:"All ages",seats:"Private slots available"}
+  ];
+  renderCamp();
+}
+function renderCamp(){
+  document.getElementById('camp-list').innerHTML=campItems.map((p,i)=>`
+    <div class="li">
+      <div class="li-head"><div class="li-title">${p.emoji} ${p.name}</div><button class="btn-del" onclick="delCamp(${i})">🗑️ Delete</button></div>
+      <div class="g3">
+        <div class="field"><label>Name</label><input id="cm-n-${i}" value="${esc(p.name)}"/></div>
+        <div class="field"><label>Emoji</label><input id="cm-em-${i}" value="${esc(p.emoji)}"/></div>
+        <div class="field"><label>Badge Label</label><input id="cm-bg-${i}" value="${esc(p.badge)}"/></div>
+      </div>
+      <div class="field"><label>Description</label><textarea id="cm-ds-${i}">${esc(p.desc)}</textarea></div>
+      <div class="g2">
+        <div class="field"><label>Duration</label><input id="cm-du-${i}" value="${esc(p.duration)}"/></div>
+        <div class="field"><label>Timing</label><input id="cm-tm-${i}" value="${esc(p.timing)}"/></div>
+        <div class="field"><label>Age Group</label><input id="cm-ag-${i}" value="${esc(p.age)}"/></div>
+        <div class="field"><label>Seats Text</label><input id="cm-st-${i}" value="${esc(p.seats)}"/></div>
+      </div>
+      <div class="field"><label>Featured Card</label>
+        <div class="tw"><label class="toggle"><input type="checkbox" id="cm-ft-${i}" ${p.featured?'checked':''}/><span class="tog-sl"></span></label><span style="font-size:.82rem;color:var(--muted)">Show as highlighted/featured</span></div>
+      </div>
+    </div>`).join('');
+}
+function addCamp(){campItems.push({name:"New Program",emoji:"🌟",badge:"New",featured:false,desc:"Program details.",duration:"30 Days",timing:"Morning: 8 AM – 10 AM",age:"All ages",seats:"Limited seats!"});renderCamp();}
+function delCamp(i){campItems.splice(i,1);renderCamp();}
+async function saveCamp(){
+  const progs={};
+  campItems.map((p,i)=>({...p,name:v(`cm-n-${i}`),emoji:v(`cm-em-${i}`),badge:v(`cm-bg-${i}`),desc:v(`cm-ds-${i}`),duration:v(`cm-du-${i}`),timing:v(`cm-tm-${i}`),age:v(`cm-ag-${i}`),seats:v(`cm-st-${i}`),featured:document.getElementById(`cm-ft-${i}`).checked})).forEach((p,i)=>progs['p'+i]=p);
+  const ok=await fbSet('camp',{seasonBadge:v('cp-badge'),desc:v('cp-desc'),programs:progs});
+  if(ok)toast('✅ Summer Camp saved!');
+}
+
+// ── VIDEOS ───────────────────────────────────────────────
+let vidItems=[];
+async function loadVids(){
+  const d=await fbGet('videos');
+  vidItems=d?Object.values(d):[{title:"Bollywood Showcase 2025",desc:"Annual performance",ytId:""},{title:"Hip Hop Battle Night",desc:"Student freestyle",ytId:""},{title:"Garba Navratri 2025",desc:"Cultural celebration",ytId:""}];
+  renderVids();
+}
+function renderVids(){
+  document.getElementById('vid-list').innerHTML=vidItems.map((v,i)=>`
+    <div class="li">
+      <div class="li-head"><div class="li-title">🎬 Video ${i+1}</div><button class="btn-del" onclick="delVid(${i})">🗑️ Delete</button></div>
+      <div class="g2">
+        <div class="field"><label>Title</label><input id="vd-t-${i}" value="${esc(v.title)}"/></div>
+        <div class="field"><label>Description</label><input id="vd-d-${i}" value="${esc(v.desc)}"/></div>
+      </div>
+      <div class="field"><label>YouTube Video ID *</label><input id="vd-y-${i}" value="${esc(v.ytId)}" placeholder="e.g. dQw4w9WgXcQ"/>
+        ${v.ytId?`<div style="margin-top:8px;border-radius:8px;overflow:hidden"><iframe style="width:100%;height:160px;border:none" src="https://www.youtube.com/embed/${v.ytId}" loading="lazy" allowfullscreen></iframe></div>`:''}
+      </div>
+    </div>`).join('');
+}
+function addVid(){vidItems.push({title:"New Video",desc:"",ytId:""});renderVids();}
+function delVid(i){vidItems.splice(i,1);renderVids();}
+async function saveVideos(){
+  const data={};
+  vidItems.map((_,i)=>({title:v(`vd-t-${i}`),desc:v(`vd-d-${i}`),ytId:v(`vd-y-${i}`)})).forEach((x,i)=>data['v'+i]=x);
+  const ok=await fbSet('videos',data);
+  if(ok){toast('✅ Videos saved!');await loadVids();}
+}
+
+// ── GALLERY ──────────────────────────────────────────────
+const galDefaults=[
+  {label:"Hip Hop Showcase",caption:"Hip Hop Night 🔥",bg:"bg1",emoji:"🕺",img:""},
+  {label:"Bollywood Show",caption:"Annual Show 🎭",bg:"bg2",emoji:"🎬",img:""},
+  {label:"Garba Night",caption:"Navratri 2025 ✨",bg:"bg3",emoji:"🪔",img:""},
+  {label:"Wedding Performance",caption:"Sangeet Night 💒",bg:"bg4",emoji:"💍",img:""},
+  {label:"Summer Camp",caption:"Camp 2025 🌟",bg:"bg5",emoji:"☀️",img:""},
+  {label:"Competition Win",caption:"Award Ceremony 🥇",bg:"bg6",emoji:"🏆",img:""}
+];
+async function loadGallery(){
+  const d=await fbGet('gallery');
+  const items=d?Object.values(d):galDefaults;
+  document.getElementById('gal-list').innerHTML=items.map((g,i)=>`
+    <div class="li">
+      <div class="li-head"><div class="li-title">📸 Slot ${i+1}: ${g.label}</div></div>
+      <div class="g2">
+        <div class="field"><label>Label</label><input id="ga-l-${i}" value="${esc(g.label)}"/></div>
+        <div class="field"><label>Caption (hover)</label><input id="ga-c-${i}" value="${esc(g.caption)}"/></div>
+        <div class="field"><label>Emoji Placeholder</label><input id="ga-e-${i}" value="${esc(g.emoji)}"/></div>
+        <div class="field"><label>Photo URL (from imgbb.com)</label><input id="ga-i-${i}" value="${esc(g.img||'')}" placeholder="https://i.ibb.co/..."/>
+          ${g.img?`<img src="${g.img}" style="width:100%;height:70px;object-fit:cover;border-radius:6px;margin-top:6px" loading="lazy"/>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+  window._galItems=items;
+}
+async function saveGallery(){
+  const items=window._galItems||galDefaults;
+  const data={};
+  items.map((g,i)=>({...g,label:v(`ga-l-${i}`),caption:v(`ga-c-${i}`),emoji:v(`ga-e-${i}`),img:v(`ga-i-${i}`)})).forEach((g,i)=>data['g'+i]=g);
+  const ok=await fbSet('gallery',data);
+  if(ok)toast('✅ Gallery saved!');
+}
+
+// ── TESTIMONIALS ─────────────────────────────────────────
+let testiItems=[];
+const AVATAR_COLORS=['linear-gradient(135deg,#a855f7,#7c3aed)','linear-gradient(135deg,#f0b429,#f59e0b)','linear-gradient(135deg,#fb923c,#ea580c)','linear-gradient(135deg,#22c55e,#16a34a)','linear-gradient(135deg,#3b82f6,#1d4ed8)'];
+async function loadTesti(){
+  const d=await fbGet('testimonials');
+  testiItems=d?Object.values(d):[
+    {text:"My daughter was shy. After 3 months she performed on stage! Trainers are amazing.",name:"Priya Deshpande",role:"Parent · Kids Batch",color:"linear-gradient(135deg,#a855f7,#7c3aed)",initial:"P"},
+    {text:"Best wedding choreography in Akot! Everyone loved our sangeet. Highly recommended!",name:"Rahul & Sneha Joshi",role:"Wedding Choreography",color:"linear-gradient(135deg,#f0b429,#f59e0b)",initial:"R"},
+    {text:"Garba batch was super fun! In 30 days I learned so many steps. Will join again!",name:"Anjali Kukde",role:"Garba Batch Student",color:"linear-gradient(135deg,#fb923c,#ea580c)",initial:"A"}
+  ];
+  renderTesti();
+}
+function renderTesti(){
+  document.getElementById('testi-list').innerHTML=testiItems.map((t,i)=>`
+    <div class="li">
+      <div class="li-head"><div class="li-title">⭐ ${t.name}</div><button class="btn-del" onclick="delTesti(${i})">🗑️ Delete</button></div>
+      <div class="field"><label>Review Text</label><textarea id="ts-tx-${i}">${esc(t.text)}</textarea></div>
+      <div class="g3">
+        <div class="field"><label>Student Name</label><input id="ts-nm-${i}" value="${esc(t.name)}"/></div>
+        <div class="field"><label>Role / Batch</label><input id="ts-rl-${i}" value="${esc(t.role)}"/></div>
+        <div class="field"><label>Avatar Letter</label><input id="ts-in-${i}" value="${esc(t.initial)}" maxlength="2"/></div>
+      </div>
+    </div>`).join('');
+}
+function addTesti(){testiItems.push({text:"Great academy!",name:"New Student",role:"Dance Batch",color:AVATAR_COLORS[testiItems.length%AVATAR_COLORS.length],initial:"N"});renderTesti();}
+function delTesti(i){testiItems.splice(i,1);renderTesti();}
+async function saveTesti(){
+  const data={};
+  testiItems.map((t,i)=>({...t,text:v(`ts-tx-${i}`),name:v(`ts-nm-${i}`),role:v(`ts-rl-${i}`),initial:v(`ts-in-${i}`)})).forEach((t,i)=>data['t'+i]=t);
+  const ok=await fbSet('testimonials',data);
+  if(ok)toast('✅ Testimonials saved!');
+}
+
+// ── CONTACT ──────────────────────────────────────────────
+async function loadContact(){
+  const d=await fbGet('contact')||{};
+  document.getElementById('c-addr').value=d.address||'Ingle Dance Academy, Gandhi Chowk, Akot, Maharashtra – 444101';
+  document.getElementById('c-phone').value=d.phone||'+91 99999 99999';
+  document.getElementById('c-time').value=d.timings||'Morning: 7 AM – 9 AM · Evening: 5 PM – 8 PM';
+  document.getElementById('c-map').value=d.mapEmbed||'';
+}
+async function saveContact(){
+  const ok=await fbSet('contact',{address:v('c-addr'),phone:v('c-phone'),timings:v('c-time'),mapEmbed:v('c-map')});
+  if(ok)toast('✅ Contact info saved!');
+}
+
+// ── PASSWORD ─────────────────────────────────────────────
+function savePW(){
+  const u=v('pw-u'),p=v('pw-p'),c=v('pw-c');
+  if(p!==c){toast('❌ Passwords do not match!',false);return;}
+  if(u)localStorage.setItem('ida_u',u);
+  if(p)localStorage.setItem('ida_p',p);
+  toast('🔑 Password updated successfully!');
+}
+
+// ── UTILS ─────────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
